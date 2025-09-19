@@ -1,1 +1,32 @@
 <!-- PLACEHOLDER: resume template 3 -->
+<!-- template3.html -->
+<div class="resume-template" style="font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; border: 1px solid #ccc;">
+  
+  <header style="border-bottom: 2px solid #333; margin-bottom: 15px;">
+    <h1 th:text="${fullName}">Full Name</h1>
+    <p>
+      <span th:text="${email}">email@example.com</span> | 
+      <span th:text="${mobile}">+91-XXXXXXXXXX</span>
+    </p>
+  </header>
+
+  <section>
+    <h2>Profile</h2>
+    <p th:text="${summary}">Your professional summary goes here.</p>
+  </section>
+
+  <section>
+    <h2>Skills</h2>
+    <p th:text="${skills}">Java, Spring Boot, MongoDB</p>
+  </section>
+
+  <section>
+    <h2>Experience</h2>
+    <p th:text="${experience}">Your work experience here.</p>
+  </section>
+
+  <section>
+    <h2>Education</h2>
+    <p th:text="${education}">Your education details here.</p>
+  </section>
+</div>

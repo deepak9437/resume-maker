@@ -1,6 +1,9 @@
 <!-- PLACEHOLDER: resume template 1 -->
 <!-- This is a sample template used for preview or server-side rendering.
      The frontend preview uses simple HTML; template files can be more elaborate. -->
+
+     <!-- 
+
 <div class="resume-template">
   <header>
     <h1>{{fullName}}</h1>
@@ -14,5 +17,42 @@
     <h3>Skills</h3>
     <p>{{skills}}</p>
   </section>
-  <!-- ... -->
+  
 </div>
+
+-->
+     
+
+ 
+
+<div class="resume-template">
+  <header>
+    <h1 th:text="${fullName}">Full Name</h1>
+    <p>
+      <span th:text="${email}">email@example.com</span> | 
+      <span th:text="${mobile}">+91-XXXXXXXXXX</span>
+    </p>
+  </header>
+
+  <section>
+    <h3>Profile</h3>
+    <p th:text="${summary}">Short professional summary goes here.</p>
+  </section>
+
+  <section>
+    <h3>Skills</h3>
+    <p th:text="${skills}">Java, Spring Boot, MongoDB</p>
+  </section>
+
+ 
+  <section>
+    <h3>Education</h3>
+    <p th:text="${education}">Your education details here.</p>
+  </section>
+
+  <section>
+    <h3>Experience</h3>
+    <p th:text="${experience}">Your work experience here.</p>
+  </section>
+</div>
+
