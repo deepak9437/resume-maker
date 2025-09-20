@@ -1,5 +1,5 @@
 // Base backend URL - change if your backend runs on a different host/port
-const backendBaseUrl = '/api';
+const backendBaseUrl = 'http://localhost:8080/api';
 
 // Utility to show simple alerts
 function alertMsg(msg) {
