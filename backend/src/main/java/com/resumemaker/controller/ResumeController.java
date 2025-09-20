@@ -2,7 +2,6 @@
 package com.resumemaker.controller;
 
 import com.resumemaker.model.Resume;
-import com.resumemaker.model.ResumeData; // <-- import the new model
 import com.resumemaker.service.ResumeService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/resumes")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${frontend.url}")
 public class ResumeController {
     private final ResumeService resumeService;
 
@@ -55,30 +54,6 @@ public class ResumeController {
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.status(500).body(Map.of("error", "Failed to generate PDF"));
-        }
-    }
-
-    // ✅ New: Generate resume instantly from frontend form
-    @PostMapping("/generate")
-    public ResponseEntity<?> generateResume(@RequestBody ResumeData resumeData) {
-        try {
-            // Debug log
-            System.out.println("Generating resume for: " + resumeData.getName());
-
-            // You can enhance this to call your service for PDF/HTML generation
-            String resumePreview = "Resume for: " + resumeData.getName() +
-                    "\nEmail: " + resumeData.getEmail() +
-                    "\nPhone: " + resumeData.getPhone() +
-                    "\nSummary: " + resumeData.getSummary() +
-                    "\nEducation: " + resumeData.getEducation() +
-                    "\nExperience: " + resumeData.getExperience() +
-                    "\nSkills: " + resumeData.getSkills();
-
-            // For now just return text preview to confirm data is flowing
-            return ResponseEntity.ok(Map.of("status", "ok", "resumeContent", resumePreview));
-
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
     }
 }
