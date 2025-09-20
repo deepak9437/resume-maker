@@ -1,5 +1,5 @@
 // Base backend URL - change if your backend runs on a different host/port
-const backendBaseUrl = 'http://localhost:8080/api';
+const backendBaseUrl = '/api';
 
 // Utility to show simple alerts
 function alertMsg(msg) {
@@ -21,15 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Attach event listeners for all subscription forms
-  ['subscribeForm', 'subscribeForm2', 'subscribeForm3', 'subscribeForm4', 'subscribeForm5'].forEach(id => {
-    const form = document.getElementById(id);
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert('Thanks for subscribing! (This is a demo feature)');
-      });
-    }
+  const subscriptionForms = document.querySelectorAll('.subscription-form');
+  subscriptionForms.forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Thanks for subscribing! (This is a demo feature)');
+    });
   });
+
 
   // Page-specific initializations
   const pathname = document.location.pathname;
@@ -132,7 +131,10 @@ function initializePreviewPage() {
   const downloadBtn = document.getElementById('downloadPdf');
   if (downloadBtn) {
     downloadBtn.addEventListener('click', () => {
-      window.open(`${backendBaseUrl}/resumes/${resumeId}/export`, '_blank');
+      const newWindow = window.open(`${backendBaseUrl}/resumes/${resumeId}/export`, '_blank');
+      if (newWindow) {
+        newWindow.opener = null;
+      }
     });
   }
 }
@@ -165,9 +167,14 @@ async function submitResume() {
   const imageInput = document.getElementById('profileImage');
   let imageBase64 = null;
   if (imageInput.files && imageInput.files[0]) {
-    imageBase64 = await fileToBase64(imageInput.files[0]);
-    if (!imageBase64) return;
+    try {
+      imageBase64 = await fileToBase64(imageInput.files[0]);
+    } catch (error) {
+      alertMsg('Error processing image file.');
+      return;
+    }
   }
+
 
   const payload = {
     userId,
@@ -202,7 +209,7 @@ async function submitResume() {
 
 async function loadPreview(id) {
   try {
-    const res = await fetch(`${backendBaseUrl}/resumes/${id}`); // ✅ fixed variable
+    const res = await fetch(`${backendBaseUrl}/resumes/${id}`);
     if (!res.ok) {
       alertMsg('Failed to fetch resume data for preview.');
       return;
