@@ -35,10 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pathname = document.location.pathname;
 
   if (pathname.endsWith('home.html')) {
-    // Optional: Protect the home page from non-logged-in users
     if (!localStorage.getItem('userId')) {
-      // You could redirect them to the login page
-      // window.location.href = 'index.html';
       console.warn('Not logged in. Allowing access for demo purposes.');
     }
   }
@@ -138,23 +135,11 @@ function initializePreviewPage() {
       window.open(`${backendBaseUrl}/resumes/${resumeId}/export`, '_blank');
     });
   }
-
-  const editBtn = document.getElementById('editBtn');
-  if (editBtn) {
-    // The href will be set after the resume data is loaded in loadPreview
-  }
 }
 
 /* ------------------ Core Resume Logic ------------------ */
-
-/**
- * Converts a file to a Base64 encoded string.
- * @param {File} file The file to convert.
- * @returns {Promise<string|null>} The Base64 string or null on error.
- */
 async function fileToBase64(file) {
   if (!file) return null;
-  // Limit file size to 1MB
   if (file.size > 1_000_000) {
     alertMsg('Image is too large. Please use an image under 1 MB.');
     return null;
@@ -162,8 +147,6 @@ async function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      // Result format is "data:image/jpeg;base64,XXXX..."
-      // We only want the part after the comma
       const base64String = reader.result.split(',')[1];
       resolve(base64String);
     };
@@ -183,7 +166,7 @@ async function submitResume() {
   let imageBase64 = null;
   if (imageInput.files && imageInput.files[0]) {
     imageBase64 = await fileToBase64(imageInput.files[0]);
-    if (!imageBase64) return; // Stop if file conversion failed
+    if (!imageBase64) return;
   }
 
   const payload = {
@@ -208,7 +191,6 @@ async function submitResume() {
     });
     const data = await res.json();
     if (res.ok) {
-      // Redirect to the preview page with the new resume ID
       window.location.href = `preview.html?id=${data.resumeId}`;
     } else {
       alertMsg(data.error || 'Failed to create resume.');
@@ -218,23 +200,17 @@ async function submitResume() {
   }
 }
 
-/**
- * **SECURITY-FIXED VERSION**
- * Fetches resume data and safely populates the preview area.
- * @param {string} id The ID of the resume to load.
- */
 async function loadPreview(id) {
   try {
-    const res = await fetch(`${backendBase_url}/resumes/${id}`);
+    const res = await fetch(`${backendBaseUrl}/resumes/${id}`); // ✅ fixed variable
     if (!res.ok) {
       alertMsg('Failed to fetch resume data for preview.');
       return;
     }
     const r = await res.json();
     const area = document.getElementById('previewArea');
-    area.innerHTML = ''; // Clear previous content
+    area.innerHTML = '';
 
-    // Safely create and append elements to prevent XSS
     const createSection = (title, content) => {
       const section = document.createElement('div');
       const h5 = document.createElement('h5');
@@ -285,7 +261,6 @@ async function loadPreview(id) {
 
     area.appendChild(row);
 
-    // Set the edit button link
     const editBtn = document.getElementById('editBtn');
     if (editBtn) {
       editBtn.href = `form.html?template=${r.templateId}&edit=${id}`;
