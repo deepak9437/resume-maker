@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/resumes")
-@CrossOrigin(origins = "${frontend.url}")
+// @CrossOrigin(origins = "${frontend.url}")
 public class ResumeController {
     private final ResumeService resumeService;
 
