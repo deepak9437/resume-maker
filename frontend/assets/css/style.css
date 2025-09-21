@@ -81,3 +81,17 @@ body{
 .fit:hover{
     transform: scale(1.2);
 }
+
+/* --- Styles for Form Page Text --- */
+
+/* Targets the 'Enter details for your resume' heading */
+section h3 {
+  color: #FFC107; /* A strong, golden yellow */
+}
+
+/* Targets the labels above each input box */
+.form-label {
+  color: rgb(237, 84, 18); /* A slightly off-white color for high readability */
+  font-weight: 500; /* Makes the text a little bolder */
+}
+
