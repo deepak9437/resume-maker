@@ -7,6 +7,26 @@
   <title>Resume Maker — Choose Template</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+
+ <style>
+    /* body {
+      background: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    } */
+    .carousel {
+      width: auto;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .carousel img {
+      object-fit: cover;
+      height: 450px;
+    }
+  </style> 
+
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark header-bg">
@@ -22,13 +42,64 @@
     </div>
   </nav>
 
+
+
+
+
+
+
+<div id="carouselExampleCaptions" class="carousel slide">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="https://cdn.mos.cms.futurecdn.net/xz7tsxrUbTfFnXfiaUbZSL.jpg" class="d-block w-100" alt="Slide 1">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>First slide label</h5>
+        <p>Some representative placeholder content for the first slide.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="https://cdn.mos.cms.futurecdn.net/xz7tsxrUbTfFnXfiaUbZSL.jpg" class="d-block w-100" alt="Slide 2">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Second slide label</h5>
+        <p>Some representative placeholder content for the second slide.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="https://cdn.mos.cms.futurecdn.net/xz7tsxrUbTfFnXfiaUbZSL.jpg" class="d-block w-100" alt="Slide 3">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Third slide label</h5>
+        <p>Some representative placeholder content for the third slide.</p>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+
+
+
+
+
+
   <section class="py-5">
     <div class="container">
-      <h2 class="mb-4">Choose a template</h2>
+      <h2 class="mb-4 hd">CHOOSE A TAMPLATE FOR YOUR RESUME</h2>
       <div class="row g-4">
         <div class="col-md-4">
           <div class="card template-card">
-            <img src="assets/img/template1.png" class="card-img-top" alt="template 1">
+            <img src="assets/img/template1.png" class="card-img-top fit" alt="template 1">
             <div class="card-body">
               <h5 class="card-title">Modern Minimal</h5>
               <p class="card-text">Clean, professional layout.</p>
@@ -38,7 +109,7 @@
         </div>
         <div class="col-md-4">
           <div class="card template-card">
-            <img src="assets/img/template2.png" class="card-img-top" alt="template 2">
+            <img src="assets/img/template2.png" class="card-img-top fit" alt="template 2">
             <div class="card-body">
               <h5 class="card-title">Bold Accent</h5>
               <p class="card-text">Great for creative profiles.</p>
@@ -48,7 +119,7 @@
         </div>
         <div class="col-md-4">
           <div class="card template-card">
-            <img src="assets/img/template3.png" class="card-img-top" alt="template 3">
+            <img src="assets/img/template3.png" class="card-img-top fit" alt="template 3">
             <div class="card-body">
               <h5 class="card-title">Classic</h5>
               <p class="card-text">Traditional single-column resume.</p>
@@ -59,6 +130,11 @@
       </div>
     </div>
   </section>
+
+
+
+
+
 
   <!-- Footer -->
 <footer class="footer-bg text-white py-4">
@@ -79,6 +155,15 @@
       <div class="text-center mt-3">© 2025 Resume-Maker — All rights reserved</div>
     </div>
   </footer>
+
+
+
+  
+  <!-- Bootstrap JS Bundle (required for carousel controls) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
 
   <script src="assets/js/script.js"></script>
 </body>

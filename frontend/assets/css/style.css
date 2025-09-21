@@ -8,6 +8,7 @@
 
 body{
   background-color: var(--muted);
+   /* background: linear-gradient(90deg, var(--primary), #10243a); */
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   color: #222;
 }
@@ -57,4 +58,26 @@ body{
 /* Footer forms */
 .footer-bg .form-control{
   border-radius: 999px;
+}
+
+.py-5{
+    background-image: url(../img/bg-image.jpg);
+    background-position: right;
+}
+
+.hd{
+    color: rgb(237, 84, 18);
+    font-weight: 700;
+    font-style: italic;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+
+.fit{
+    aspect-ratio: 2 / 3;
+    object-fit: fill;
+    transition: .3s all;
+}
+.fit:hover{
+    transform: scale(1.2);
 }
