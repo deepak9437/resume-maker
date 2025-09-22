@@ -7,13 +7,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -22,9 +21,6 @@ import java.util.Optional;
 @Service
 public class ResumeService {
     private final ResumeRepository resumeRepository;
-    private PDFont helvetica;
-    private PDFont helveticaBold;
-
 
     public ResumeService(ResumeRepository resumeRepository) {
         this.resumeRepository = resumeRepository;
@@ -40,17 +36,11 @@ public class ResumeService {
 
     public byte[] generatePdf(Resume r) throws Exception {
         try (PDDocument doc = new PDDocument()) {
-            // Load a font that supports a wide range of characters
-            try (InputStream fontStream = ResumeService.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf")) {
-                helvetica = PDType0Font.load(doc, fontStream);
-            }
-            try (InputStream fontStream = ResumeService.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Bold.ttf")) {
-                helveticaBold = PDType0Font.load(doc, fontStream);
-            }
-
-
             PDPage page = new PDPage(PDRectangle.A4);
             doc.addPage(page);
+
+            PDFont helvetica = PDType1Font.HELVETICA;
+            PDFont helveticaBold = PDType1Font.HELVETICA_BOLD;
 
             try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
                 float margin = 50;
@@ -87,11 +77,11 @@ public class ResumeService {
                 yPosition -= 30;
 
                 // Add sections with text wrapping
-                yPosition = addSection(cs, "Profile", r.getSummary(), margin, yPosition, width);
-                yPosition = addSection(cs, "Skills", r.getSkills(), margin, yPosition, width);
-                yPosition = addSection(cs, "Education", r.getEducation(), margin, yPosition, width);
-                yPosition = addSection(cs, "Experience", r.getExperience(), margin, yPosition, width);
-                addSection(cs, "Hobbies", r.getHobbies(), margin, yPosition, width);
+                yPosition = addSection(cs, "Profile", r.getSummary(), margin, yPosition, width, helvetica, helveticaBold);
+                yPosition = addSection(cs, "Skills", r.getSkills(), margin, yPosition, width, helvetica, helveticaBold);
+                yPosition = addSection(cs, "Education", r.getEducation(), margin, yPosition, width, helvetica, helveticaBold);
+                yPosition = addSection(cs, "Experience", r.getExperience(), margin, yPosition, width, helvetica, helveticaBold);
+                addSection(cs, "Hobbies", r.getHobbies(), margin, yPosition, width, helvetica, helveticaBold);
             }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -101,13 +91,13 @@ public class ResumeService {
     }
 
     // --- HELPER METHODS ---
-    private float addSection(PDPageContentStream cs, String title, String text, float margin, float yPosition, float width) throws IOException {
+    private float addSection(PDPageContentStream cs, String title, String text, float margin, float yPosition, float width, PDFont font, PDFont fontBold) throws IOException {
         if (text == null || text.trim().isEmpty()) {
             return yPosition; // Skip empty sections
         }
 
         // Section Title
-        cs.setFont(helveticaBold, 12);
+        cs.setFont(fontBold, 12);
         cs.beginText();
         cs.newLineAtOffset(margin, yPosition);
         cs.showText(title);
@@ -115,8 +105,8 @@ public class ResumeService {
         yPosition -= 20;
 
         // Section Content with wrapping
-        cs.setFont(helvetica, 11);
-        List<String> lines = wrapText(text, helvetica, 11, width);
+        cs.setFont(font, 11);
+        List<String> lines = wrapText(text, font, 11, width);
         for (String line : lines) {
             cs.beginText();
             cs.newLineAtOffset(margin, yPosition);
