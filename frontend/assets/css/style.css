@@ -97,3 +97,17 @@ section h3 {
   font-weight: 500; /* Makes the text a little bolder */
 }
 
+
+/* --- Styles for Preview Page --- */
+
+/* Targets the container holding the resume content */
+#previewArea {
+  background-color: #FFFFFF; /* A solid white background */
+  color: #212529;           /* Ensures the text inside is dark and readable */
+  border-radius: 8px;       /* Adds soft, rounded corners */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* A subtle shadow to lift it off the page */
+} 
+
+
+
+
