@@ -93,7 +93,7 @@ public class ResumeService {
     // --- HELPER METHODS ---
     private float addSection(PDPageContentStream cs, String title, String text, float margin, float yPosition, float width, PDFont font, PDFont fontBold) throws IOException {
         if (text == null || text.trim().isEmpty()) {
-            return yPosition; // Skip empty sections
+            return yPosition;
         }
 
         // Section Title
@@ -104,33 +104,38 @@ public class ResumeService {
         cs.endText();
         yPosition -= 20;
 
-        // Section Content with wrapping
+        // Section Content
         cs.setFont(font, 11);
-        List<String> lines = wrapText(text, font, 11, width);
-        for (String line : lines) {
-            cs.beginText();
-            cs.newLineAtOffset(margin, yPosition);
-            cs.showText(line);
-            cs.endText();
-            yPosition -= 15; // Line spacing
+        String[] paragraphs = text.split("\n"); // Split the text by newlines
+        for (String paragraph : paragraphs) {
+            List<String> lines = wrapText(paragraph, font, 11, width);
+            for (String line : lines) {
+                cs.beginText();
+                cs.newLineAtOffset(margin, yPosition);
+                cs.showText(line);
+                cs.endText();
+                yPosition -= 15; // Line spacing
+            }
         }
-        return yPosition - 10; // Space after section
+        return yPosition - 10;
     }
 
     private List<String> wrapText(String text, PDFont font, float fontSize, float maxWidth) throws IOException {
         List<String> lines = new ArrayList<>();
         if (text == null) return lines;
+        
+        text = text.replaceAll("\r", ""); // Remove carriage return characters
 
         String[] words = text.split(" ");
         StringBuilder currentLine = new StringBuilder();
 
         for (String word : words) {
-            float width = font.getStringWidth(currentLine + " " + word) / 1000 * fontSize;
+            float width = font.getStringWidth(currentLine + (currentLine.isEmpty() ? "" : " ") + word) / 1000 * fontSize;
             if (width > maxWidth) {
                 lines.add(currentLine.toString());
                 currentLine = new StringBuilder(word);
             } else {
-                if (currentLine.length() > 0) {
+                if (!currentLine.isEmpty()) {
                     currentLine.append(" ");
                 }
                 currentLine.append(word);
