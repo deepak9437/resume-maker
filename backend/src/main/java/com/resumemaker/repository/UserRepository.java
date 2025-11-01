@@ -2,11 +2,12 @@ package com.resumemaker.repository;
 
 import com.resumemaker.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
+// import org.springframework.stereotype.Repository; // <-- Removed this line
 
 import java.util.Optional;
 
-@Repository
+// Note: The @Repository annotation was removed. 
+// It is redundant for Spring Data repositories and causes a warning.
 public interface UserRepository extends MongoRepository<User, String> {
 
     // Find user by email
