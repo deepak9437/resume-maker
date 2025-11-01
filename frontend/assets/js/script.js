@@ -1,13 +1,56 @@
 // Base backend URL - THIS MUST BE THE FULL URL
-// Set this to your Spring Boot URL
-const backendBaseUrl = 'http://localhost:8080/api'; 
+const backendBaseUrl = 'http://localhost:8080/api';
 
 // Utility to show simple alerts
-function alertMsg(msg) {
-  // We are replacing this for most features with non-blocking UI alerts
-  // but it's a good fallback.
-  alert(msg);
+// We create a custom, non-blocking alert function
+function alertMsg(msg, isError = false) {
+  console.log(msg); // Log to console as a fallback
+
+  // Check if an alert box already exists
+  let alertBox = document.getElementById('customAlertBox');
+  if (!alertBox) {
+    // If not, create it
+    alertBox = document.createElement('div');
+    alertBox.id = 'customAlertBox';
+    // Basic styling
+    alertBox.style.position = 'fixed';
+    alertBox.style.top = '20px';
+    alertBox.style.left = '50%';
+    alertBox.style.transform = 'translateX(-50%)';
+    alertBox.style.padding = '16px';
+    alertBox.style.borderRadius = '8px';
+    alertBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    alertBox.style.zIndex = '9999';
+    alertBox.style.fontWeight = '500';
+    alertBox.style.minWidth = '300px';
+    alertBox.style.textAlign = 'center';
+    alertBox.style.opacity = '0'; // Start invisible for fade-in
+    alertBox.style.transition = 'opacity 0.3s ease';
+    document.body.appendChild(alertBox);
+  }
+
+  // Set message and color
+  alertBox.textContent = msg;
+  if (isError) {
+    alertBox.style.backgroundColor = '#f8d7da'; // Bootstrap danger background
+    alertBox.style.color = '#721c24'; // Bootstrap danger text
+  } else {
+    alertBox.style.backgroundColor = '#d4edda'; // Bootstrap success background
+    alertBox.style.color = '#155724'; // Bootstrap success text
+  }
+
+  // Make it visible and set a timer to fade it out
+  setTimeout(() => {
+    alertBox.style.opacity = '1';
+  }, 10); // Short delay to allow CSS transition
+
+  // Hide and remove after 3 seconds
+  setTimeout(() => {
+    alertBox.style.opacity = '0';
+    // We can remove it after it fades out, or just hide it
+  }, 3000);
 }
+
 
 /* ------------------ Event Listeners for Page Load ------------------ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        alert('Thanks for subscribing! (This is a demo feature)');
+        alertMsg('Thanks for subscribing!');
       });
     }
   });
@@ -51,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializePreviewPage();
   }
 
-  // *** NEW: Initialize forgot password page logic ***
+  // --- New listener for the forgot password page ---
   if (pathname.endsWith('forgot-password.html')) {
     initializeForgotPassword();
   }
@@ -75,10 +118,11 @@ async function handleLogin(e) {
       localStorage.setItem('userName', data.userName);
       window.location.href = 'home.html';
     } else {
-      alertMsg(data.error || 'Login failed. Please check your credentials.');
+      alertMsg(data.error || 'Login failed. Please check your credentials.', true);
     }
   } catch (err) {
-    alertMsg('Server error: ' + err.message);
+    alertMsg('Server error. Failed to fetch.', true);
+    console.error(err);
   }
 }
 
@@ -103,32 +147,39 @@ async function handleRegister(e) {
       alertMsg('Registration successful! Please log in.');
       window.location.href = 'index.html';
     } else {
-      alertMsg(data.error || 'Registration failed.');
+      alertMsg(data.error || 'Registration failed.', true);
     }
   } catch (err) {
-    alertMsg('Server error: ' + err.message);
+    alertMsg('Server error. Failed to fetch.', true);
+    console.error(err);
   }
 }
 
-/* ------------------ Forgot Password Handlers ------------------ */
+/* ------------------ New Forgot Password Handlers (Single Page) ------------------ */
 
 function initializeForgotPassword() {
-  const sendOtpForm = document.getElementById('sendOtpForm');
-  if (sendOtpForm) {
-    sendOtpForm.addEventListener('submit', handleSendOtp);
-  }
+  const step1Form = document.getElementById('step1Form');
+  const step2Form = document.getElementById('step2Form');
 
-  const resetPasswordForm = document.getElementById('resetPasswordForm');
-  if (resetPasswordForm) {
-    resetPasswordForm.addEventListener('submit', handleResetPassword);
+  if (step1Form) {
+    step1Form.addEventListener('submit', handleSendOtp);
+  }
+  if (step2Form) {
+    step2Form.addEventListener('submit', handleResetPassword);
   }
 }
 
 async function handleSendOtp(e) {
   e.preventDefault();
   const mobile = document.getElementById('mobile').value.trim();
-  const hintBox = document.getElementById('otp-hint'); // Get the new hint box
-  hintBox.style.display = 'none'; // Hide old hints
+  const step1Form = document.getElementById('step1Form');
+  const step2Form = document.getElementById('step2Form');
+  const otpHint = document.getElementById('otp-hint'); // The hint box
+
+  if (!mobile) {
+    alertMsg('Please enter a mobile number.', true);
+    return;
+  }
 
   try {
     const res = await fetch(`${backendBaseUrl}/auth/forgot-password/send-otp`, {
@@ -136,32 +187,39 @@ async function handleSendOtp(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile })
     });
-
     const data = await res.json();
-    if (res.ok && data.status === 'ok') {
-      // *** THIS IS THE UPDATED LOGIC ***
-      // Instead of alertMsg, we show the OTP on the page
-      
-      hintBox.innerHTML = `<strong>Demo OTP: ${data.otp}</strong> (use this below)`;
-      hintBox.style.display = 'block';
 
-      // Now, show step 2 and hide step 1
-      document.getElementById('step1').style.display = 'none';
-      document.getElementById('step2').style.display = 'block';
+    if (res.ok && data.otp) {
+      // Success!
+      // Put mobile number into the hidden field in step 2
+      document.getElementById('mobile-hidden').value = mobile;
+
+      // Show the demo OTP hint
+      if (otpHint) {
+        otpHint.querySelector('strong').textContent = data.otp; // Put OTP in the hint
+        otpHint.style.display = 'block'; // Show the hint
+      }
+
+      // Hide Step 1 and Show Step 2
+      step1Form.style.display = 'none';
+      step2Form.style.display = 'block';
+
     } else {
-      alertMsg(data.error || 'Failed to send OTP.');
+      alertMsg(data.error || 'Mobile number not found.', true);
     }
   } catch (err) {
-    alertMsg('Server error: ' + err.message);
+    alertMsg('Server error. Failed to fetch.', true);
+    console.error(err);
   }
 }
 
 async function handleResetPassword(e) {
   e.preventDefault();
-  // Get mobile from the (now hidden) step 1 form
-  const mobile = document.getElementById('mobile').value.trim(); 
+  // Get values from the second form
+  const mobile = document.getElementById('mobile-hidden').value;
   const otp = document.getElementById('otp').value.trim();
   const newPassword = document.getElementById('newPassword').value.trim();
+  const otpHint = document.getElementById('otp-hint'); // The hint box
 
   const payload = { mobile, otp, newPassword };
 
@@ -171,21 +229,23 @@ async function handleResetPassword(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-
     const data = await res.json();
+
     if (res.ok && data.status === 'ok') {
-      alertMsg('Password reset successful! You can now log in with your new password.');
+      alertMsg('Password reset successful! Please log in.');
+      if(otpHint) otpHint.style.display = 'none'; // Hide the hint
       window.location.href = 'index.html';
     } else {
-      alertMsg(data.error || 'Password reset failed.');
+      alertMsg(data.error || 'Invalid or expired OTP.', true);
     }
   } catch (err) {
-    alertMsg('Server error: ' + err.message);
+    alertMsg('Server error. Failed to fetch.', true);
+    console.error(err);
   }
 }
 
 
-/* ------------------ Page Initializers ------------------ */
+/* ------------------ Page Initializers (Existing) ------------------ */
 function initializeResumeForm() {
   const params = new URLSearchParams(location.search);
   const template = params.get('template') || 'template1';
@@ -207,7 +267,7 @@ function initializePreviewPage() {
   const params = new URLSearchParams(location.search);
   const resumeId = params.get('id');
   if (!resumeId) {
-    alertMsg('No resume ID provided.');
+    alertMsg('No resume ID provided.', true);
     return;
   }
   loadPreview(resumeId);
@@ -220,11 +280,11 @@ function initializePreviewPage() {
   }
 }
 
-/* ------------------ Core Resume Logic ------------------ */
+/* ------------------ Core Resume Logic (Existing) ------------------ */
 async function fileToBase64(file) {
   if (!file) return null;
   if (file.size > 1_000_000) {
-    alertMsg('Image is too large. Please use an image under 1 MB.');
+    alertMsg('Image is too large. Please use an image under 1 MB.', true);
     return null;
   }
   return new Promise((resolve, reject) => {
@@ -241,7 +301,7 @@ async function fileToBase64(file) {
 async function submitResume() {
   const userId = localStorage.getItem('userId');
   if (!userId) {
-    alertMsg('You must be logged in to create a resume.');
+    alertMsg('You must be logged in to create a resume.', true);
     return;
   }
 
@@ -276,10 +336,11 @@ async function submitResume() {
     if (res.ok) {
       window.location.href = `preview.html?id=${data.resumeId}`;
     } else {
-      alertMsg(data.error || 'Failed to create resume.');
+      alertMsg(data.error || 'Failed to create resume.', true);
     }
   } catch (err) {
-    alertMsg('Server error: ' + err.message);
+    alertMsg('Server error. Failed to fetch.', true);
+    console.error(err);
   }
 }
 
@@ -287,7 +348,7 @@ async function loadPreview(id) {
   try {
     const res = await fetch(`${backendBaseUrl}/resumes/${id}`); // ✅ fixed variable
     if (!res.ok) {
-      alertMsg('Failed to fetch resume data for preview.');
+      alertMsg('Failed to fetch resume data for preview.', true);
       return;
     }
     const r = await res.json();
@@ -350,7 +411,8 @@ async function loadPreview(id) {
     }
 
   } catch (err) {
-    alertMsg('Server error: ' + err.message);
+    alertMsg('Server error. Failed to fetch.', true);
+    console.error(err);
   }
 }
 
