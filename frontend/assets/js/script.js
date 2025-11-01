@@ -1,8 +1,11 @@
 // Base backend URL - THIS MUST BE THE FULL URL
-const backendBaseUrl = 'http://localhost:8080/api';
+// Set this to your Spring Boot URL
+const backendBaseUrl = 'http://localhost:8080/api'; 
 
 // Utility to show simple alerts
 function alertMsg(msg) {
+  // We are replacing this for most features with non-blocking UI alerts
+  // but it's a good fallback.
   alert(msg);
 }
 
@@ -46,6 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (pathname.endsWith('preview.html')) {
     initializePreviewPage();
+  }
+
+  // *** NEW: Initialize forgot password page logic ***
+  if (pathname.endsWith('forgot-password.html')) {
+    initializeForgotPassword();
   }
 });
 
@@ -101,6 +109,81 @@ async function handleRegister(e) {
     alertMsg('Server error: ' + err.message);
   }
 }
+
+/* ------------------ Forgot Password Handlers ------------------ */
+
+function initializeForgotPassword() {
+  const sendOtpForm = document.getElementById('sendOtpForm');
+  if (sendOtpForm) {
+    sendOtpForm.addEventListener('submit', handleSendOtp);
+  }
+
+  const resetPasswordForm = document.getElementById('resetPasswordForm');
+  if (resetPasswordForm) {
+    resetPasswordForm.addEventListener('submit', handleResetPassword);
+  }
+}
+
+async function handleSendOtp(e) {
+  e.preventDefault();
+  const mobile = document.getElementById('mobile').value.trim();
+  const hintBox = document.getElementById('otp-hint'); // Get the new hint box
+  hintBox.style.display = 'none'; // Hide old hints
+
+  try {
+    const res = await fetch(`${backendBaseUrl}/auth/forgot-password/send-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mobile })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.status === 'ok') {
+      // *** THIS IS THE UPDATED LOGIC ***
+      // Instead of alertMsg, we show the OTP on the page
+      
+      hintBox.innerHTML = `<strong>Demo OTP: ${data.otp}</strong> (use this below)`;
+      hintBox.style.display = 'block';
+
+      // Now, show step 2 and hide step 1
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
+    } else {
+      alertMsg(data.error || 'Failed to send OTP.');
+    }
+  } catch (err) {
+    alertMsg('Server error: ' + err.message);
+  }
+}
+
+async function handleResetPassword(e) {
+  e.preventDefault();
+  // Get mobile from the (now hidden) step 1 form
+  const mobile = document.getElementById('mobile').value.trim(); 
+  const otp = document.getElementById('otp').value.trim();
+  const newPassword = document.getElementById('newPassword').value.trim();
+
+  const payload = { mobile, otp, newPassword };
+
+  try {
+    const res = await fetch(`${backendBaseUrl}/auth/forgot-password/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok && data.status === 'ok') {
+      alertMsg('Password reset successful! You can now log in with your new password.');
+      window.location.href = 'index.html';
+    } else {
+      alertMsg(data.error || 'Password reset failed.');
+    }
+  } catch (err) {
+    alertMsg('Server error: ' + err.message);
+  }
+}
+
 
 /* ------------------ Page Initializers ------------------ */
 function initializeResumeForm() {
@@ -270,3 +353,4 @@ async function loadPreview(id) {
     alertMsg('Server error: ' + err.message);
   }
 }
+
