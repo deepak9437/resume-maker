@@ -1,5 +1,4 @@
-// PLACEHOLDER: ResumeRepository
-package com.resumemaker.repository;
+package com.resumemaker;
 
 import com.resumemaker.model.Resume;
 import org.springframework.data.mongodb.repository.MongoRepository;
