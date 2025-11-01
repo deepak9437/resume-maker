@@ -61,7 +61,8 @@ public class AuthController {
         try {
             String otp = userService.generateOtp(mobile);
             // In production, you DON'T return the OTP. This is just for our demo.
-            return ResponseEntity.ok(Map.of("status", "ok", "message", "OTP sent.", "demoOtp", otp));
+            // *** THIS IS THE CORRECTED LINE ***
+            return ResponseEntity.ok(Map.of("status", "ok", "message", "OTP sent.", "otp", otp));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
@@ -86,3 +87,4 @@ public class AuthController {
         }
     }
 }
+

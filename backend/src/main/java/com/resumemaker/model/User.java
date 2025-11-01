@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant; // *** IMPORT THIS ***
+import java.time.Instant; // <-- THIS WAS THE MISSING IMPORT
 
 @Document(collection = "users")
 public class User {
@@ -26,7 +26,7 @@ public class User {
 
     private String passwordHash;
 
-    // *** FIELDS for OTP ***
+    // Fields for password reset
     private String otp;
     private Instant otpExpiry;
 
@@ -48,6 +48,8 @@ public class User {
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
 
+    // This line was the error and has been removed.
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
@@ -60,7 +62,6 @@ public class User {
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    // *** GETTERS/SETTERS for OTP ***
     public String getOtp() { return otp; }
     public void setOtp(String otp) { this.otp = otp; }
 

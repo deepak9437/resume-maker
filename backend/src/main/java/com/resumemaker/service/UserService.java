@@ -6,9 +6,10 @@ import com.resumemaker.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom; // *** NEW IMPORT ***
-import java.time.Instant; // *** NEW IMPORT ***
-import java.time.temporal.ChronoUnit; // *** NEW IMPORT ***
+// --- Imports for Password Reset ---
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -16,7 +17,6 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserRepository userRepository;
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    private final SecureRandom random = new SecureRandom(); // *** NEW ***
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -55,47 +55,48 @@ public class UserService {
         }
     }
 
-    private boolean isEmailValid(String email) {
-        return EMAIL_PATTERN.matcher(email).matches();
-    }
-
-    // *** NEW METHOD: Generate and save OTP ***
+    // --- THIS IS THE METHOD YOU WERE MISSING ---
     public String generateOtp(String mobile) throws Exception {
         User user = userRepository.findByMobile(mobile)
-                .orElseThrow(() -> new Exception("No user found with this mobile number."));
+                .orElseThrow(() -> new Exception("User not found with that mobile number."));
 
         // Generate 4-digit OTP
-        String otp = String.format("%04d", random.nextInt(10000));
+        String otp = new SecureRandom().ints(1000, 10000).findFirst().getAsInt() + "";
         
-        // Set OTP and 10-minute expiry
         user.setOtp(otp);
-        user.setOtpExpiry(Instant.now().plus(10, ChronoUnit.MINUTES));
+        user.setOtpExpiry(Instant.now().plus(10, ChronoUnit.MINUTES)); // 10-minute expiry
         userRepository.save(user);
-
-        // In a real app, you'd send this via SMS and not return it.
-        // We return it here for the demo.
+        
         return otp;
     }
 
-    // *** NEW METHOD: Reset password with OTP ***
+    // --- THIS METHOD IS ALSO NEEDED ---
     public void resetPassword(String mobile, String otp, String newPassword) throws Exception {
         User user = userRepository.findByMobile(mobile)
-                .orElseThrow(() -> new Exception("Invalid mobile number."));
+                .orElseThrow(() -> new Exception("User not found."));
 
-        // Check 1: OTP is correct
+        // Check if OTP is valid and not expired
         if (user.getOtp() == null || !user.getOtp().equals(otp)) {
-            throw new Exception("Invalid or incorrect OTP.");
+            throw new Exception("Invalid OTP.");
         }
-
-        // Check 2: OTP has not expired
         if (user.getOtpExpiry() == null || user.getOtpExpiry().isBefore(Instant.now())) {
-            throw new Exception("OTP has expired. Please request a new one.");
+            throw new Exception("OTP has expired.");
         }
 
-        // All checks passed. Reset password and clear OTP.
-        user.setPasswordHash(BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
+        // All checks passed. Reset password.
+        String newPasswordHash = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
+        user.setPasswordHash(newPasswordHash);
+
+        // Clear the OTP fields
         user.setOtp(null);
         user.setOtpExpiry(null);
+        
         userRepository.save(user);
     }
+
+
+    private boolean isEmailValid(String email) {
+        return EMAIL_PATTERN.matcher(email).matches();
+    }
 }
+
