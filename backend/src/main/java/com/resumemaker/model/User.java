@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant; // *** IMPORT THIS ***
+
 @Document(collection = "users")
 public class User {
 
@@ -23,6 +25,11 @@ public class User {
     private String userId;
 
     private String passwordHash;
+
+    // *** FIELDS for OTP ***
+    private String otp;
+    private Instant otpExpiry;
+
 
     public User() {}
 
@@ -52,4 +59,12 @@ public class User {
 
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+    // *** GETTERS/SETTERS for OTP ***
+    public String getOtp() { return otp; }
+    public void setOtp(String otp) { this.otp = otp; }
+
+    public Instant getOtpExpiry() { return otpExpiry; }
+    public void setOtpExpiry(Instant otpExpiry) { this.otpExpiry = otpExpiry; }
 }
+

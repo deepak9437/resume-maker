@@ -50,4 +50,39 @@ public class AuthController {
                 .map(u -> ResponseEntity.ok(Map.of("status", "ok", "userId", u.getId(), "userName", u.getFullName())))
                 .orElseGet(() -> ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
     }
+
+    // *** NEW ENDPOINT: Send OTP ***
+    @PostMapping("/forgot-password/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
+        String mobile = body.get("mobile");
+        if (mobile == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Mobile number is required."));
+        }
+        try {
+            String otp = userService.generateOtp(mobile);
+            // In production, you DON'T return the OTP. This is just for our demo.
+            return ResponseEntity.ok(Map.of("status", "ok", "message", "OTP sent.", "demoOtp", otp));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    // *** NEW ENDPOINT: Reset Password ***
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String mobile = body.get("mobile");
+        String otp = body.get("otp");
+        String newPassword = body.get("newPassword");
+
+        if (mobile == null || otp == null || newPassword == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields."));
+        }
+
+        try {
+            userService.resetPassword(mobile, otp, newPassword);
+            return ResponseEntity.ok(Map.of("status", "ok", "message", "Password reset successfully."));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
 }

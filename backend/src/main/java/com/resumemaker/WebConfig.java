@@ -7,12 +7,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    /**
+     * This is a wide-open CORS configuration for development.
+     * It allows all origins, methods, and headers.
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins("http://127.0.0.1:3000", "http://localhost:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+        registry.addMapping("/api/**") // Apply to all API routes
+                .allowedOrigins("*")   // Allow requests from any origin
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Allow all common methods
+                .allowedHeaders("*")   // Allow all headers
+                .allowCredentials(false); // Set to false for wildcard origin
     }
 }

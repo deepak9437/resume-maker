@@ -102,6 +102,24 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- 
+                    *** MODIFICATION: Added version to fix warning ***
+                    (We get this from the dependencyManagement)
+                -->
+                <version>${spring.boot.version}</version>
+            </plugin>
+            
+            <!-- 
+                *** NEW PLUGIN: To force Java 17 compilation ***
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version> <!-- Use a modern version -->
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
