@@ -1,6 +1,9 @@
-// PLACEHOLDER: Resume model
 package com.resumemaker.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,17 +11,36 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Resume {
     @Id
     private String id;
+
+    @NotBlank(message = "User ID is required")
     private String userId;
+
     private String templateId;
 
+    @NotBlank(message = "Full name is required")
+    @Size(min = 2, max = 100, message = "Full name must be between 2 and 100 characters")
     private String fullName;
+
+    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Invalid mobile number")
     private String mobile;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email address")
     private String email;
+
+    @Size(max = 500, message = "Summary cannot exceed 500 characters")
     private String summary;
     // skills stored as comma-separated string for simplicity
+    @Size(max = 500, message = "Skills cannot exceed 500 characters")
     private String skills;
+
+    @Size(max = 1000, message = "Education details cannot exceed 1000 characters")
     private String education;
+
+    @Size(max = 2000, message = "Experience details cannot exceed 2000 characters")
     private String experience;
+
+    @Size(max = 200, message = "Hobbies cannot exceed 200 characters")
     private String hobbies;
 
     // Profile image stored as Base64 string (without data URI prefix)

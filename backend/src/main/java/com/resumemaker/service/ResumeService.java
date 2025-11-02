@@ -11,6 +11,8 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,22 @@ public class ResumeService {
 
     public Optional<Resume> findById(@NonNull String id) {
         return resumeRepository.findById(id);
+    }
+
+    public Page<Resume> findByUserId(@NonNull String userId, int page, int size) {
+        return resumeRepository.findByUserId(userId, PageRequest.of(page, size));
+    }
+
+    public Page<Resume> searchByName(@NonNull String query, int page, int size) {
+        return resumeRepository.findByFullNameContainingIgnoreCase(query, PageRequest.of(page, size));
+    }
+
+    public boolean exists(@NonNull String id) {
+        return resumeRepository.existsById(id);
+    }
+
+    public void deleteById(@NonNull String id) {
+        resumeRepository.deleteById(id);
     }
 
     public byte[] generatePdf(@NonNull Resume resume) throws IOException {
