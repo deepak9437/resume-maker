@@ -1,10 +1,12 @@
-// PLACEHOLDER: main Spring Boot application class
 package com.resumemaker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import com.resumemaker.config.JwtConfig;
 
 @SpringBootApplication
+@EnableConfigurationProperties(JwtConfig.class)
 public class ResumeMakerApp {
     public static void main(String[] args) {
         SpringApplication.run(ResumeMakerApp.class, args);
