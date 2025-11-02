@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -88,7 +87,7 @@ public class ResumeController {
      */
     @GetMapping("/search")
     public ResponseEntity<Page<Resume>> searchResumes(
-            @RequestParam String query,
+            @RequestParam @NonNull String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(resumeService.searchByName(query, page, size));
@@ -108,13 +107,21 @@ public class ResumeController {
                 return ResponseEntity.notFound().build();
             }
 
-            byte[] pdf = resumeService.generatePdf(resumeOpt.get());
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, 
-                           String.format("attachment; filename=\"resume-%s.pdf\"", id))
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF.toString())
-                    .body(pdf);
+            Resume resume = resumeOpt.get();
+            // Validate that the resume is not null before generating PDF
+            if (resume == null) {
+                logger.error("Resume is null for ID: {}", id);
+                return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Invalid resume data"));
+            }
+
+            byte[] pdf = resumeService.generatePdf(resume);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"resume-%s.pdf\"", id));
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            
+            return new ResponseEntity<>(pdf, headers, org.springframework.http.HttpStatus.OK);
         } catch (Exception ex) {
             logger.error("Failed to generate PDF for resume {}", id, ex);
             return ResponseEntity.internalServerError()
