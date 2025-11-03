@@ -17,15 +17,13 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserRepository userRepository;
     
-    // *** We still inject the SmsService ***
-    private final SmsService smsService; 
+    // *** REMOVED: The SmsService ***
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
-    // *** Constructor is unchanged ***
-    public UserService(UserRepository userRepository, SmsService smsService) {
+    // *** UPDATED: Constructor no longer needs SmsService ***
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.smsService = smsService;
     }
 
     public User register(User u, String rawPassword) throws Exception {
@@ -61,7 +59,7 @@ public class UserService {
         }
     }
 
-    // Returns OTP for demo purposes only. In production, this should return void.
+    // *** MODIFIED: This method now RETURNS the OTP string ***
     public String generateOtp(String mobile) throws Exception {
         User user = userRepository.findByMobile(mobile)
                 .orElseThrow(() -> new Exception("User not found with that mobile number."));
@@ -73,16 +71,11 @@ public class UserService {
         user.setOtpExpiry(Instant.now().plus(10, ChronoUnit.MINUTES)); // 10-minute expiry
         userRepository.save(user);
         
-        // Send OTP via SMS
-        String messageBody = "Your Resume Maker OTP is: " + otp;
-        // We send the raw mobile number. SmsService will clean it.
-        smsService.sendSms(mobile, messageBody);
-        
-        // Return OTP for demo purposes
+        // *** NEW: Return the OTP for demo mode ***
         return otp;
     }
 
-    // --- THIS METHOD IS ALSO NEEDED ---
+    // --- THIS METHOD IS UNCHANGED ---
     public void resetPassword(String mobile, String otp, String newPassword) throws Exception {
         User user = userRepository.findByMobile(mobile)
                 .orElseThrow(() -> new Exception("User not found."));
@@ -99,7 +92,7 @@ public class UserService {
         String newPasswordHash = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
         user.setPasswordHash(newPasswordHash);
 
-        // Clear the OTP fields
+        // Clear the OTP fields 
         user.setOtp(null);
         user.setOtpExpiry(null);
         

@@ -51,7 +51,7 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
     }
 
-    // *** NEW ENDPOINT: Send OTP ***
+    // *** MODIFIED ENDPOINT: Send OTP ***
     @PostMapping("/forgot-password/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
         String mobile = body.get("mobile");
@@ -59,16 +59,17 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Mobile number is required."));
         }
         try {
+            // This method now returns the OTP string
             String otp = userService.generateOtp(mobile);
-            // In production, you DON'T return the OTP. This is just for our demo.
-            // *** THIS IS THE CORRECTED LINE ***
+            
+            // *** MODIFIED: Send the OTP back to the frontend for the demo ***
             return ResponseEntity.ok(Map.of("status", "ok", "message", "OTP sent.", "otp", otp));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
     }
 
-    // *** NEW ENDPOINT: Reset Password ***
+    // *** This endpoint is unchanged ***
     @PostMapping("/forgot-password/reset")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String mobile = body.get("mobile");
