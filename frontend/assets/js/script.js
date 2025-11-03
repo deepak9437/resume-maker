@@ -158,22 +158,27 @@ async function handleRegister(e) {
 /* ------------------ New Forgot Password Handlers (Single Page) ------------------ */
 
 function initializeForgotPassword() {
-  const step1Form = document.getElementById('step1Form');
-  const step2Form = document.getElementById('step2Form');
+  // *** THIS IS THE FIX ***
+  // Changed "step1Form" to "sendOtpForm"
+  const sendOtpForm = document.getElementById('sendOtpForm');
+  // Changed "step2Form" to "resetPasswordForm"
+  const resetPasswordForm = document.getElementById('resetPasswordForm');
 
-  if (step1Form) {
-    step1Form.addEventListener('submit', handleSendOtp);
+  if (sendOtpForm) {
+    sendOtpForm.addEventListener('submit', handleSendOtp);
   }
-  if (step2Form) {
-    step2Form.addEventListener('submit', handleResetPassword);
+  if (resetPasswordForm) {
+    resetPasswordForm.addEventListener('submit', handleResetPassword);
   }
 }
 
 async function handleSendOtp(e) {
   e.preventDefault();
   const mobile = document.getElementById('mobile').value.trim();
-  const step1Form = document.getElementById('step1Form');
-  const step2Form = document.getElementById('step2Form');
+  
+  // *** THIS IS THE FIX ***
+  const sendOtpSection = document.getElementById('send-otp-section');
+  const resetSection = document.getElementById('reset-section');
   const otpHint = document.getElementById('otp-hint'); // The hint box
 
   if (!mobile) {
@@ -192,17 +197,17 @@ async function handleSendOtp(e) {
     if (res.ok && data.otp) {
       // Success!
       // Put mobile number into the hidden field in step 2
-      document.getElementById('mobile-hidden').value = mobile;
+      document.getElementById('resetMobile').value = mobile;
 
       // Show the demo OTP hint
       if (otpHint) {
-        otpHint.querySelector('strong').textContent = data.otp; // Put OTP in the hint
+        otpHint.innerHTML = `Demo OTP (for testing): <strong>${data.otp}</strong>`; // Put OTP in the hint
         otpHint.style.display = 'block'; // Show the hint
       }
 
       // Hide Step 1 and Show Step 2
-      step1Form.style.display = 'none';
-      step2Form.style.display = 'block';
+      if (sendOtpSection) sendOtpSection.style.display = 'none';
+      if (resetSection) resetSection.style.display = 'block';
 
     } else {
       alertMsg(data.error || 'Mobile number not found.', true);
@@ -216,7 +221,7 @@ async function handleSendOtp(e) {
 async function handleResetPassword(e) {
   e.preventDefault();
   // Get values from the second form
-  const mobile = document.getElementById('mobile-hidden').value;
+  const mobile = document.getElementById('resetMobile').value;
   const otp = document.getElementById('otp').value.trim();
   const newPassword = document.getElementById('newPassword').value.trim();
   const otpHint = document.getElementById('otp-hint'); // The hint box
@@ -291,7 +296,7 @@ async function fileToBase64(file) {
     const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result.split(',')[1];
-      resolve(base64String);
+      resolve(base6S4String);
     };
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
