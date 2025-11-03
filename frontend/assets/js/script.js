@@ -159,9 +159,8 @@ async function handleRegister(e) {
 
 function initializeForgotPassword() {
   // *** THIS IS THE FIX ***
-  // Changed "step1Form" to "sendOtpForm"
+  // Correctly finding the forms by their IDs from the HTML
   const sendOtpForm = document.getElementById('sendOtpForm');
-  // Changed "step2Form" to "resetPasswordForm"
   const resetPasswordForm = document.getElementById('resetPasswordForm');
 
   if (sendOtpForm) {
@@ -194,6 +193,7 @@ async function handleSendOtp(e) {
     });
     const data = await res.json();
 
+    // *** MODIFIED: Look for data.otp ***
     if (res.ok && data.otp) {
       // Success!
       // Put mobile number into the hidden field in step 2
@@ -201,7 +201,8 @@ async function handleSendOtp(e) {
 
       // Show the demo OTP hint
       if (otpHint) {
-        otpHint.innerHTML = `Demo OTP (for testing): <strong>${data.otp}</strong>`; // Put OTP in the hint
+        // *** MODIFIED: Display the OTP ***
+        otpHint.innerHTML = `Demo OTP (for testing): <strong>${data.otp}</strong>`;
         otpHint.style.display = 'block'; // Show the hint
       }
 
@@ -239,7 +240,10 @@ async function handleResetPassword(e) {
     if (res.ok && data.status === 'ok') {
       alertMsg('Password reset successful! Please log in.');
       if(otpHint) otpHint.style.display = 'none'; // Hide the hint
+      
+      // *** THIS IS THE FIX: Changed 'index.TBD' to 'index.html' ***
       window.location.href = 'index.html';
+
     } else {
       alertMsg(data.error || 'Invalid or expired OTP.', true);
     }
@@ -296,7 +300,7 @@ async function fileToBase64(file) {
     const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result.split(',')[1];
-      resolve(base6S4String);
+      resolve(base64String);
     };
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
