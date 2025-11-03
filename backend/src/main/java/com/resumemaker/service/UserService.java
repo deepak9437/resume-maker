@@ -16,10 +16,16 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    
+    // *** We still inject the SmsService ***
+    private final SmsService smsService; 
+
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
-    public UserService(UserRepository userRepository) {
+    // *** Constructor is unchanged ***
+    public UserService(UserRepository userRepository, SmsService smsService) {
         this.userRepository = userRepository;
+        this.smsService = smsService;
     }
 
     public User register(User u, String rawPassword) throws Exception {
@@ -55,7 +61,7 @@ public class UserService {
         }
     }
 
-    // --- THIS IS THE METHOD YOU WERE MISSING ---
+    // Returns OTP for demo purposes only. In production, this should return void.
     public String generateOtp(String mobile) throws Exception {
         User user = userRepository.findByMobile(mobile)
                 .orElseThrow(() -> new Exception("User not found with that mobile number."));
@@ -67,6 +73,12 @@ public class UserService {
         user.setOtpExpiry(Instant.now().plus(10, ChronoUnit.MINUTES)); // 10-minute expiry
         userRepository.save(user);
         
+        // Send OTP via SMS
+        String messageBody = "Your Resume Maker OTP is: " + otp;
+        // We send the raw mobile number. SmsService will clean it.
+        smsService.sendSms(mobile, messageBody);
+        
+        // Return OTP for demo purposes
         return otp;
     }
 
