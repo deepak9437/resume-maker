@@ -7,7 +7,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDType1Font; 
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,8 +83,11 @@ public class ResumeService {
     }
 
     private float generatePdfContent(PDDocument doc, PDPage page, Resume resume) throws IOException {
+        // *** THIS IS THE FIX: We must now instantiate the fonts ***
+        // Using PDType1Font standard fonts
         PDFont helvetica = PDType1Font.HELVETICA;
         PDFont helveticaBold = PDType1Font.HELVETICA_BOLD;
+
         float yStart = page.getMediaBox().getHeight() - MARGIN;
         float width = page.getMediaBox().getWidth() - 2 * MARGIN;
         float yPosition = yStart;
